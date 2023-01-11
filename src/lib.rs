@@ -17,6 +17,14 @@ impl std::fmt::Display for Value {
     }
 }
 
+impl Add<Value> for f64 {
+    type Output = Value;
+
+    fn add(self, rhs: Value) -> Self::Output {
+        Self::Output::from(self + rhs.data)
+    }
+}
+
 impl Add<Value> for Value {
     type Output = Value;
 
@@ -30,6 +38,14 @@ impl Add<f64> for Value {
 
     fn add(self, rhs: f64) -> Self::Output {
         Self::Output::from(self.data + rhs)
+    }
+}
+
+impl Mul<Value> for f64 {
+    type Output = Value;
+
+    fn mul(self, rhs: Value) -> Self::Output {
+        Self::Output::from(self * rhs.data)
     }
 }
 
