@@ -1,4 +1,4 @@
-use std::ops::{Add, Mul};
+use std::ops::{Add, Div, Mul, Sub};
 
 #[derive(Debug, Clone, Copy)]
 pub struct Value {
@@ -6,8 +6,14 @@ pub struct Value {
 }
 
 impl Value {
+    const MAX_DIFF: f64 = 0.001;
+
     pub fn from(data: f64) -> Self {
         Self { data }
+    }
+
+    pub fn close_to(self, x: f64) -> bool {
+        (self.data - x).abs() <= Self::MAX_DIFF
     }
 }
 
@@ -41,6 +47,30 @@ impl Add<f64> for Value {
     }
 }
 
+impl Sub<Value> for f64 {
+    type Output = Value;
+
+    fn sub(self, rhs: Value) -> Self::Output {
+        Self::Output::from(self - rhs.data)
+    }
+}
+
+impl Sub<Value> for Value {
+    type Output = Value;
+
+    fn sub(self, rhs: Self) -> Self::Output {
+        Self::Output::from(self.data - rhs.data)
+    }
+}
+
+impl Sub<f64> for Value {
+    type Output = Value;
+
+    fn sub(self, rhs: f64) -> Self::Output {
+        Self::Output::from(self.data - rhs)
+    }
+}
+
 impl Mul<Value> for f64 {
     type Output = Value;
 
@@ -62,5 +92,61 @@ impl Mul<f64> for Value {
 
     fn mul(self, rhs: f64) -> Self::Output {
         Self::Output::from(self.data * rhs)
+    }
+}
+
+impl Div<Value> for f64 {
+    type Output = Value;
+
+    fn div(self, rhs: Value) -> Self::Output {
+        Self::Output::from(self / rhs.data)
+    }
+}
+
+impl Div<Value> for Value {
+    type Output = Value;
+
+    fn div(self, rhs: Value) -> Self::Output {
+        Self::Output::from(self.data / rhs.data)
+    }
+}
+
+impl Div<f64> for Value {
+    type Output = Value;
+
+    fn div(self, rhs: f64) -> Self::Output {
+        Self::Output::from(self.data / rhs)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    #[test]
+    fn add() {
+        let a = Value::from(3.0) + 2.0;
+        let b = 1.0 + a;
+        assert!(b.close_to(6.0))
+    }
+
+    #[test]
+    fn sub() {
+        let a = Value::from(3.0) - 2.0;
+        let b = 1.0 - a;
+        assert!(b.close_to(0.0))
+    }
+
+    #[test]
+    fn mul() {
+        let a = Value::from(3.0) * 2.0;
+        let b = 1.0 * a;
+        assert!(b.close_to(6.0))
+    }
+
+    #[test]
+    fn div() {
+        let a = Value::from(3.0) / 2.0;
+        let b = 3.0 / a;
+        assert!(b.close_to(2.0))
     }
 }
